@@ -1,7 +1,43 @@
 import os
-import re
 import sys
 from time import sleep
+import yara
+
+
+def compile_yars(rule_path, compile_path):
+    """Combines and compiles .yar files found at given path with option
+        to recurse through nested directories. Combines rule
+        files into one file - 'all_rules.yar', saved at the path provided or
+        current directory by default. Returns compiled yara rules object generated
+        from combined rule file.
+    """
+
+    # Generate list of yara files
+    rule_list = file_list_gen(rule_path, '.yar')
+    # Set path to save combined rule file
+    all_rule_file = ''.join([compile_path, 'all_rules.yar'])
+
+    # Combine all yara rule files at given path into a single file
+    with open(all_rule_file, 'wb') as all_rules:
+        print(f'Creating combined rules file: {all_rules.name}')
+        for yara_file in rule_list:
+            with open(yara_file, 'rb') as file_to_write:
+                buf = file_to_write.read()
+                all_rules.write(buf)
+        all_rules.seek(0)
+        all_rules.close()
+
+    print(f'Compiling {all_rule_file}')
+
+    # Attempt to return compiled rules object. Catch errors/warnings
+    try:
+        return yara.compile(filepath=all_rule_file, includes=False, error_on_warning=True)
+    except yara.WarningError as err:
+        sys.exit(f'[Compilation] Warning: {err}')
+    except yara.SyntaxError as err:
+        sys.exit(f'[Compilation] Syntax Error: {err}')
+    except yara.Error as err:
+        sys.exit(f'[Compilation] Error Occurred: {err}')
 
 
 def file_list_gen(search_path, ext=''):
@@ -18,7 +54,7 @@ def file_list_gen(search_path, ext=''):
     if not os.path.exists(search_path):
         sys.exit('Specified path does not exist')
     else:
-        print(f'Path found\nSearching for {ext} Files')
+        print(f'Path found\nSearching for {ext }files')
         sleep(.2)
     # Look for directories
     if any(i.is_dir() for i in os.scandir(search_path)):
