@@ -15,6 +15,16 @@ class Scanner:
     """
 
     def __init__(self, rule_set, files_to_scan, num_threads):
+        """
+       Pretty much does the whole thing in one go. Creates queue and
+       utilizes own scan method as the worker function for each thread.
+       Blocks until done, and exits. Not sure if too hacky to do all this
+        within the constructor, though?
+
+        :param rule_set: Compiled yara rules object to match against
+        :param files_to_scan: list of files to scan for matches
+        :param num_threads: number of threads to utilize
+        """
         assert isinstance(rule_set, yara.Rules), 'Not yara rules'
         self.rules = rule_set
         # Generate queue object

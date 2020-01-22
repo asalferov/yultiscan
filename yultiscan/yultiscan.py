@@ -12,7 +12,7 @@ Usage:
 
 Options:
     -t --threads=<NUM>      Number of threads to use: [default=1]
-    -c --compile-dir=<DIR>  Directory to compile ruleset: [default=current directory]
+    -c --compile-dir=<DIR>  Directory to save combined rules file: [default=current directory]
     -h --help               Show this screen
     --version               Show version
 
@@ -24,7 +24,7 @@ import utils
 
 
 if __name__ == '__main__':
-    args = docopt(__doc__, version='1.0.0')
+    args = docopt.docopt(__doc__, version='1.0.0')
     print(args)
 
     if args['--threads']:

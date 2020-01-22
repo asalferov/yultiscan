@@ -31,7 +31,7 @@ def compile_yars(rule_path, compile_path):
 
     # Attempt to return compiled rules object. Catch errors/warnings
     try:
-        return yara.compile(filepath=all_rule_file, includes=False, error_on_warning=True)
+        return yara.compile(filepath=all_rule_file, includes=False, error_on_warning=False)
     except yara.WarningError as err:
         sys.exit(f'[Compilation] Warning: {err}')
     except yara.SyntaxError as err:
@@ -42,19 +42,22 @@ def compile_yars(rule_path, compile_path):
 
 def file_list_gen(search_path, ext=''):
     """Generates and returns a list of all files in given path with option
-        to recurse through nested directories. Extension can be provided
-        optionally.
+        to interactively recurse through nested directories. Extension can be provided
+        optionally. I should just make the recursion a command line flag, shouldn't I...
     """
 
     file_list = list()
+
 
     # Confirm file path exists
     print(f'Checking {search_path}')
     sleep(.2)
     if not os.path.exists(search_path):
         sys.exit('Specified path does not exist')
+    elif not os.path.isdir(search_path):
+        sys.exit('Path to directory required')
     else:
-        print(f'Path found\nSearching for {ext }files')
+        print(f'Path found\nSearching for {ext}files')
         sleep(.2)
     # Look for directories
     if any(i.is_dir() for i in os.scandir(search_path)):
