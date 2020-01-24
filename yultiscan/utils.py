@@ -48,8 +48,8 @@ def file_list_gen(search_path, ext=''):
 
     file_list = list()
 
-
     # Confirm file path exists
+
     print(f'Checking {search_path}')
     sleep(.2)
     if not os.path.exists(search_path):

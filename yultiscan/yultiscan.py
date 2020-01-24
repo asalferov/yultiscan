@@ -34,10 +34,11 @@ if __name__ == '__main__':
     if args['--compile-dir']:
         compile_dir = args['--compile-dir']
     else:
-        compile_dir = '.'
+        compile_dir = './'
 
     rules_obj = utils.compile_yars(args['<path-to-rules>'], compile_dir)
     file_list = utils.file_list_gen(args['<path-to-scan>'])
-    scanner.Scanner(rules_obj, file_list, thread_num)
+    yara_scan = scanner.Scanner(rules_obj, file_list, thread_num)
+    yara_scan.run()
 
 

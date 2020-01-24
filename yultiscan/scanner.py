@@ -27,18 +27,31 @@ class Scanner:
         """
         assert isinstance(rule_set, yara.Rules), 'Not yara rules'
         self.rules = rule_set
+        self.threads = num_threads
+        self.files = files_to_scan
+
+
+    def run(self):
+        """
+       Pretty much does the whole thing in one go. Creates queue and
+       utilizes own scan method as the worker function for each thread.
+       Blocks until done, and exits.
+
+        :return: None
+        """
         # Generate queue object
-        file_queue = queue.Queue(maxsize=0)
+        file_queue = queue.Queue(maxsize=200)
         # Initialize threads
-        for i in range(num_threads):
+        for i in range(self.threads):
             worker = threading.Thread(target=self.__scan__, args=(file_queue,))
             worker.setDaemon(True)
             worker.start()
         # Feed target files into queue to be processed
-        for file in files_to_scan:
+        for file in self.files:
             file_queue.put(file)
         # Block until all queue files have been processed
         file_queue.join()
+
 
     def __scan__(self, q):
         while True:
@@ -49,3 +62,7 @@ class Scanner:
                 for match in matches:
                     logging.debug(f'File: {current_file}\nDetected: {match}')
             q.task_done()
+
+
+
+
